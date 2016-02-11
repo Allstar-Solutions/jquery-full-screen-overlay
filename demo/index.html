@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>jQuery Boilerplate</title>
+		<script src="../node_modules/jquery/dist/jquery.min.js"></script>
+		<script src="../src/jquery.fullScreenOverlay.js"></script>
+	</head>
+	<body>
+		<div id="element">
+			Test 1
+		</div>
+		<div id="head-content-1">
+			Head content 1
+		</div>
+		<div id="open-trigger-1">
+			Open 1
+		</div>
+		<div id="close-trigger-1">
+			Close 1
+		</div>
+		<div id="element2">
+			Test 2
+		</div>
+		<div id="open-trigger-2">
+			Open 2
+		</div>
+		<div id="close-trigger-2">
+			Close 2
+		</div>
+		<script>
+			$(function() {
+				$("#element").fullScreenOverlay({
+					fixedHeader: true, 
+					headerContent: '#head-content-1',
+					openTrigger: '#open-trigger-1',
+					closeTrigger: '#close-trigger-1'
+				});
+				$("#element2").fullScreenOverlay({
+					openTrigger: '#open-trigger-2',
+					closeTrigger: '#close-trigger-2'
+				});
+			});
+		</script>
+	</body>
+</html>
