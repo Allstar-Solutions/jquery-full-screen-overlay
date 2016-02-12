@@ -25,6 +25,10 @@ module.exports = function(grunt) {
 			dist: {
 				src: ["src/jquery.fullScreenOverlay.js"],
 				dest: "dist/jquery.fullScreenOverlay.js"
+			},
+			distcss: {
+				src: ["src/css/jquery.fullScreenOverlay.css"],
+				dest: "dist/css/jquery.fullScreenOverlay.css"
 			}
 		},
 
@@ -44,6 +48,19 @@ module.exports = function(grunt) {
 			},
 			options: {
 				banner: "<%= meta.banner %>"
+			}
+		},
+
+		// CSS minify.
+		cssmin: {
+			target: {
+				files: [{
+					expand: true,
+					src: ['*.css', '!*.min.css'],
+					cwd: 'src/css',
+					dest: 'dist/css',
+					ext: '.min.css'
+				}]
 			}
 		},
 
@@ -76,13 +93,14 @@ module.exports = function(grunt) {
 		// Better than calling grunt a million times
 		// (call 'grunt watch')
 		watch: {
-	    files: ["src/*", "test/**/*"],
+	    files: ["src/*", "test/**/*", "src/css/*"],
 	    tasks: ["default"]
 		}
 
 	});
 
 	grunt.loadNpmTasks("grunt-contrib-concat");
+	grunt.loadNpmTasks("grunt-contrib-cssmin");
 	grunt.loadNpmTasks("grunt-contrib-jshint");
 	grunt.loadNpmTasks("grunt-contrib-uglify");
 	grunt.loadNpmTasks("grunt-contrib-coffee");
