@@ -32,8 +32,8 @@ page.  Otherwise clicking the element with class .full-screen-overlay-close will
 
 The following events can be used by setting the relevant option:
 
-`onBeforeOpen(e, fullScreenOverlayObject)`
-`onAfterOpen(e, fullScreenOverlayObject)`
+`onBeforeOpen(e, fullScreenOverlayObject)`<br />
+`onAfterOpen(e, fullScreenOverlayObject)`<br />
 `onBeforeClose(e, fullScreenOverlayObject)`
 `onAfterClose(e, fullScreenOverlayObject)`
 
