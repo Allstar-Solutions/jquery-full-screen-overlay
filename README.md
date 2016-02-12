@@ -28,13 +28,16 @@ page.  Otherwise clicking the element with class .full-screen-overlay-close will
 `closeButtonOmit: 'false'`<br />
 **closeButtonOmit** *(boolean)*: When set to `true` the default close button provided by the plugin will be omitted.  Use in conjunction with `closeTrigger` to tell the plugin which element should be used as the close trigger.
 
+`cssClasses: ''`<br />
+**cssClasses** *(string)*: A space separated list of css classes to add to the overlay wrap.
+
 ### Events
 
 The following events can be used by setting the relevant option:
 
 `onBeforeOpen(e, fullScreenOverlayObject)`<br />
 `onAfterOpen(e, fullScreenOverlayObject)`<br />
-`onBeforeClose(e, fullScreenOverlayObject)`
+`onBeforeClose(e, fullScreenOverlayObject)`<br />
 `onAfterClose(e, fullScreenOverlayObject)`
 
 **Example:**
@@ -59,3 +62,5 @@ Open the overlay.  Useful for responsive where you may want to show/hide a mobil
 `$('.my-element').fullScreenOverlay('close');`
 Close the overlay.  Useful for responsive where you may want to show/hide a mobile nav overlay depending on the browser width.
 
+`$('.my-element').fullScreenOverlay('isOpen');`
+Returns true or false depending on whether the overlay is currently open.

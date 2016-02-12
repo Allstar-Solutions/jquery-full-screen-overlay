@@ -31,15 +31,17 @@
 				// This will mean that only the overlay body will scroll.
 				fixedHeader: false,
 				// Enter a jQuery selector or HTML markup.  Only applicable if fixedHeader is true.  
-				headerContent: null,
+				headerContent: '',
 				// Enter a jQuery selector or HTML markup.
-				bodyContent: null,
+				bodyContent: '',
 				// A string containing HTML markup for the close button.
-				closeButtonMarkup: null,
+				closeButtonMarkup: '',
 				// Enter a jQuery selector string.  To place in fixed header use .full-screen-overlay-header.
 				closeButtonLocation: '.full-screen-overlay-body',
 				// Set to true if you intend to add your own close button markup inside the headerContent or bodyContent.
-				closeButtonOmit: false
+				closeButtonOmit: false,
+				// A string containing multiple space separated css class to add to the overlay wrapper.
+				cssClasses: ''
 		};
 
 		// The actual plugin constructor
@@ -61,6 +63,8 @@
 				instanceId: '',
 				bodyContent: '',
 				headerContent: '',
+				overlayOpen: false,
+
 				init: function () {
 						// Place initialization logic here
 						// You already have access to the DOM element and
@@ -92,14 +96,14 @@
 				},
 
 				_hideContent: function() {
-					if(this.settings.bodyContent !== null) {
+					if(this.settings.bodyContent !== '') {
 						$(this.settings.bodyContent).hide();
 					}
 					else {
 						$(this.element).hide();
 					}
 
-					if(this.settings.fixedHeader && this.settings.headerContent !== null) {
+					if(this.settings.fixedHeader && this.settings.headerContent !== '') {
 						$(this.settings.headerContent).hide();
 					}
 				},
@@ -114,6 +118,8 @@
 						classes = "full-screen-overlay-wrap full-screen-overlay-fixed-header";
 						headerMarkup = this._headerBoilerplate();
 					}
+
+					classes = classes + ' ' + this.settings.cssClasses;
 
 					var markup = '<div style="display:none;" class="' + classes + ' ' + this.id + '" id="' + this.id + '">' +
 							         '<div class="full-screen-overlay">' +
@@ -148,7 +154,7 @@
 
 					var markup = "<div class='full-screen-overlay-close' title='Click to close overlay.' role='button'>";
 
-					if(this.settings.closeButtonMarkup !== null) {
+					if(this.settings.closeButtonMarkup !== '') {
 						markup = markup + this.settings.closeButtonMarkup;
 					}
 					else {
@@ -167,7 +173,7 @@
 				_addBodyContent: function() {
 					// Grab the body content and append to the overlay body. Appending moves
 					// the content into the overlay (as oppose to cloning it).
-					if(this.settings.bodyContent === null) {
+					if(this.settings.bodyContent === '') {
 						// No body content provided so use the jQuery element that fullScreenOverlay()
 						// was activated on.
 						$(this.element).show();
@@ -180,7 +186,9 @@
 				},
 
 				open: function(e, _this) {
-					e.preventDefault();
+					if(typeof e !== 'undefined') {
+						e.preventDefault();
+					}
 
 					if(typeof this.settings.onBeforeOpen !== 'undefined') {
 						this.settings.onBeforeOpen(e, _this);
@@ -198,9 +206,13 @@
 					// Rmove the scrolling ability on the HTML body to avoid duplicate scrollbars
 					// and to prevent the content underneath from scrolling.
 					$('body').addClass('full-screen-overlay-no-scroll');
+					$('.full-screen-overlay', '#' + this.id).removeClass('full-screen-overlay-no-scroll');
 
 					// If other overlays are displayed, close them.
 					$('.full-screen-overlay-wrap').hide();
+
+					// Denote that the overlay is open.
+					this.overlayOpen = true;
 
 					// Finally, show the overlay.
 					$('#' + this.id).show();
@@ -209,8 +221,10 @@
 						this.settings.onAfterOpen(e, _this);
 					}
 				},
-				close: function() {
-					e.preventDefault();
+				close: function(e) {
+					if(typeof e !== 'undefined') {
+						e.preventDefault();
+					}
 
 					if(typeof this.settings.onBeforeClose !== 'undefined') {
 						this.settings.onBeforeClose(e, _this);
@@ -219,10 +233,20 @@
 					// Hide the overlay.
 					$('#' + this.id).fadeOut();
 
+					// Active the scrolling ability on the HTML body.
+					$('.full-screen-overlay', '#' + this.id).addClass('full-screen-overlay-no-scroll');
+					$('body').removeClass('full-screen-overlay-no-scroll');
+
+					// Denote that the overlay is open.
+					this.overlayOpen = false;
+
 					if(typeof this.settings.onAfterClose !== 'undefined') {
 						this.settings.onAfterClose(e, _this);
 					}
 				},
+				isOpen: function() {
+					return this.overlayOpen;
+				}
 		});
 
 		// A really lightweight plugin wrapper around the constructor,
