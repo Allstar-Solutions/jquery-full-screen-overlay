@@ -1,0 +1,46 @@
+body {
+
+}
+.full-screen-overlay-wrap {
+	width: 100%;
+    top: 0;
+    z-index: 1001;
+    position: absolute;
+}
+.full-screen-overlay-fixed-header {
+	
+}
+.full-screen-overlay-header-wrap {
+    height: 130px;
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    background: #fff;
+}
+.full-screen-overlay-header {
+	max-width: 1200px;
+    padding: 0 18px;
+    margin: 0 auto;
+}
+.full-screen-overlay-body-wrap {
+	width: 100%;
+	top: 130px;
+    position: fixed;
+    overflow-y: scroll !important;
+    bottom: 0;
+    background-color: #fff;
+    padding-top: 63px;
+    color: #000;	
+    background: #fff;
+}
+.full-screen-overlay-body {
+	max-width: 1200px;
+    padding: 0 26px;
+    margin: 0 auto;
+    overflow-y: hidden;
+}
+
+.full-screen-overlay-no-scroll {
+	overflow-y: hidden;
+	position: fixed;
+}
