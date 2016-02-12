@@ -4,6 +4,7 @@
 
 	"use strict";
 
+	// Allow multiple instances of the overlay and track each version with this counter.
 	var instanceId = 0;
 
 		// undefined is used here as the undefined global variable in ECMAScript 3 is
@@ -31,15 +32,15 @@
 				fixedHeader: false,
 				// Enter a jQuery selector or HTML markup.  Only applicable if fixedHeader is true.  
 				headerContent: null,
-				// When using a fixed header, a fixed height must be given.  Only applicable when
-				// fixedHeader is set to true.
-				headerHeight: '80px',
 				// Enter a jQuery selector or HTML markup.
-				bodyContent: null
+				bodyContent: null,
+				// A string containing HTML markup for the close button.
+				closeButtonMarkup: null,
+				// Enter a jQuery selector string.  To place in fixed header use .full-screen-overlay-header.
+				closeButtonLocation: '.full-screen-overlay-body',
+				// Set to true if you intend to add your own close button markup inside the headerContent or bodyContent.
+				closeButtonOmit: false
 		};
-
-		// Allow multiple instances of the plugin.
-		var instances = [];
 
 		// The actual plugin constructor
 		function Plugin ( element, options ) {
@@ -75,17 +76,17 @@
 						// once the overlay is triggered.
 						this._hideContent();
 
-						this._events(_this);
 						this._createOverlayBoilerplate();
+						this._events(_this);
 				},
 				_events: function(_this) {
 						// Open the overlay handler.
-						$(this.settings.openTrigger).on('click keypress', function() {
-							_this.open();
+						$(_this.settings.openTrigger).on('click keypress', function(e) {
+							_this.open(e);
 						});
 						// Close overlay handler.
-						$(this.settings.closeTrigger).on('click keypress', function() {
-							_this.close();
+						$(_this.settings.closeTrigger).on('click keypress', function(e) {
+							_this.close(e);
 						});
 				},
 
@@ -103,40 +104,60 @@
 				},
 
 				_createOverlayBoilerplate: function() {
-					var markup = '<div style="display:none;" class="full-screen-overlay-wrap" id="' + this.id + '">' +
-									'<div class="full-screen-overlay">';
+					var classes = "full-screen-overlay-wrap full-screen-overlay-no-fixed-header";
+					var headerMarkup = '';
 
-					if(this.settings.fixedHeader === true) {
-						markup = markup + this._headerBoilerplate();
+					if(this.settings.fixedHeader) {
+						classes = "full-screen-overlay-wrap full-screen-overlay-fixed-header";
+						headerMarkup = this._headerBoilerplate();
 					}
 
-					markup = markup + this._bodyBoilerplate() +
-								 '</div></div>';
+					var markup = '<div style="display:none;" class="' + classes + '" id="' + this.id + '">' +
+							         '<div class="full-screen-overlay">' +
+								         headerMarkup +
+									     this._bodyBoilerplate() +
+							         '</div>' +
+						          '</div>';
 
 					$('body').append(markup);
+
+					// Add the close button.
+					$('#' + this.id + ' ' + this.settings.closeButtonLocation).append(this._closeButtonMarkup());
 				},
 				_headerBoilerplate: function() {
-					return "<div class='full-screen-overlay-header-wrap'>" +
-						       "<div class='full-screen-overlay-header'>" +
-							   "</div>" +
-						   "</div>";
+					var markup =  "<div class='full-screen-overlay-header-wrap'>" +
+						       		 "<div class='full-screen-overlay-header'>";
+
+					return markup + "</div>" +
+						   		 "</div>";
 				},
 				_bodyBoilerplate: function() {
-					return "<div class='full-screen-overlay-body-wrap'>" +
-						       "<div class='full-screen-overlay-body'>" +
-							   "</div>" +
-						   "</div>";
-				},
+					var markup = "<div class='full-screen-overlay-body-wrap'>" +
+						             "<div class='full-screen-overlay-body'>";
 
+					return markup + "</div>" +
+						        "</div>";
+				},
+				_closeButtonMarkup: function() {
+					if(this.settings.closeButtonOmit) {
+						return '';
+					}
+
+					var markup = "<div class='full-screen-overlay-close' title='Click to close overlay.' role='button'>";
+
+					if(this.settings.closeButtonMarkup !== null) {
+						markup = markup + this.settings.closeButtonMarkup;
+					}
+					else {
+						markup = markup + "<i class='fa fa-times'></i>";
+					}
+					return markup + "</div>";
+				},
 				_addHeadContent: function() {
 					// Create the header content.
 					if(this.settings.fixedHeader) {
 						$(this.settings.headerContent).show();
 						$('.full-screen-overlay-header', '#' + this.id).append($(this.settings.headerContent));
-
-						// If we have a fixed header then we remove the scrolling ability
-						// on the HTML body to avoid duplicate scrollbars.
-						$('body').addClass('full-screen-overlay-no-scroll');
 					}
 				},
 
@@ -155,20 +176,40 @@
 					}
 				},
 
-				open: function() {
-					this._addHeadContent();
+				open: function(e) {
 
+					if(typeof this.settings.onBeforeOpen !== 'undefined') {
+						this.settings.onBeforeOpen(e);
+					}
+
+					this._addHeadContent();
 					this._addBodyContent();
 
-					// If other overlays ar displayed, close them.
+					// Rmove the scrolling ability on the HTML body to avoid duplicate scrollbars
+					// and to prevent the content underneath from scrolling.
+					$('body').addClass('full-screen-overlay-no-scroll');
+
+					// If other overlays are displayed, close them.
 					$('.full-screen-overlay-wrap').hide();
 
 					// Finally, show the overlay.
 					$('#' + this.id).show();
+
+					if(typeof this.settings.onAfterOpen !== 'undefined') {
+						this.settings.onAfterOpen(e);
+					}
 				},
 				close: function() {
+					if(typeof this.settings.onBeforeClose !== 'undefined') {
+						this.settings.onBeforeClose(e);
+					}
+
 					// Hide the overlay.
 					$('#' + this.id).fadeOut();
+
+					if(typeof this.settings.onAfterClose !== 'undefined') {
+						this.settings.onAfterClose(e);
+					}
 				},
 		});
 
