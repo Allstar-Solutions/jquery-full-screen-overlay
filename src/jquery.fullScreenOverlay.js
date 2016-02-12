@@ -180,6 +180,7 @@
 				},
 
 				open: function(e, _this) {
+					e.preventDefault();
 
 					if(typeof this.settings.onBeforeOpen !== 'undefined') {
 						this.settings.onBeforeOpen(e, _this);
@@ -209,6 +210,8 @@
 					}
 				},
 				close: function() {
+					e.preventDefault();
+
 					if(typeof this.settings.onBeforeClose !== 'undefined') {
 						this.settings.onBeforeClose(e, _this);
 					}
