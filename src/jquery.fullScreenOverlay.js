@@ -108,12 +108,14 @@
 					var classes = "full-screen-overlay-wrap full-screen-overlay-no-fixed-header";
 					var headerMarkup = '';
 
+					// Denote fixed header on the main wrapper, so that the body can adjust it's
+					// styles accordingly in the CSS file.
 					if(this.settings.fixedHeader) {
 						classes = "full-screen-overlay-wrap full-screen-overlay-fixed-header";
 						headerMarkup = this._headerBoilerplate();
 					}
 
-					var markup = '<div style="display:none;" class="' + classes + '" id="' + this.id + '">' +
+					var markup = '<div style="display:none;" class="' + classes + ' ' + this.id + '" id="' + this.id + '">' +
 							         '<div class="full-screen-overlay">' +
 								         headerMarkup +
 									     this._bodyBoilerplate() +
