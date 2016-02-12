@@ -4,6 +4,8 @@
 
 	"use strict";
 
+	var instanceId = 0;
+
 		// undefined is used here as the undefined global variable in ECMAScript 3 is
 		// mutable (ie. it can be changed by someone else). undefined isn't really being
 		// passed in so we can ensure the value of it is truly undefined. In ES5, undefined
@@ -55,7 +57,7 @@
 		// Avoid Plugin.prototype conflicts
 		$.extend(Plugin.prototype, {
 				id: '',
-				selector: '',
+				instanceId: '',
 				bodyContent: '',
 				headerContent: '',
 				init: function () {
@@ -66,28 +68,28 @@
 						// you can add more functions like the one below and
 						// call them like the example below
 						var _this = this;
-						this.instanceNum = $(this.element).data("plugin_fullScreenOverlay_instance_num");
-						this.id = 'full-screen-overlay-' + this.instanceNum;
+						this.instanceId = $(this.element).data("plugin_fullScreenOverlay_instanceId");
+						this.id = 'full-screen-overlay-' + this.instanceId;
 
 						// We should hide the header and body content initially. We will only show it
 						// once the overlay is triggered.
-						this.hideContent();
+						this._hideContent();
 
-						this.events(_this);
-						this.createOverlayBoilerplate();
+						this._events(_this);
+						this._createOverlayBoilerplate();
 				},
-				events: function(_this) {
+				_events: function(_this) {
 						// Open the overlay handler.
 						$(this.settings.openTrigger).on('click keypress', function() {
-							_this.openOverlay();
+							_this.open();
 						});
 						// Close overlay handler.
 						$(this.settings.closeTrigger).on('click keypress', function() {
-							_this.closeOverlay();
+							_this.close();
 						});
 				},
 
-				hideContent: function() {
+				_hideContent: function() {
 					if(this.settings.bodyContent !== null) {
 						$(this.settings.bodyContent).hide();
 					}
@@ -100,45 +102,33 @@
 					}
 				},
 
-				createOverlayBoilerplate: function() {
+				_createOverlayBoilerplate: function() {
 					var markup = '<div style="display:none;" class="full-screen-overlay-wrap" id="' + this.id + '">' +
 									'<div class="full-screen-overlay">';
 
 					if(this.settings.fixedHeader === true) {
-						markup = markup + this.headerBoilerplate();
+						markup = markup + this._headerBoilerplate();
 					}
 
-					markup = markup + this.bodyBoilerplate() +
+					markup = markup + this._bodyBoilerplate() +
 								 '</div></div>';
 
 					$('body').append(markup);
 				},
-				headerBoilerplate: function() {
+				_headerBoilerplate: function() {
 					return "<div class='full-screen-overlay-header-wrap'>" +
 						       "<div class='full-screen-overlay-header'>" +
 							   "</div>" +
 						   "</div>";
 				},
-				bodyBoilerplate: function() {
+				_bodyBoilerplate: function() {
 					return "<div class='full-screen-overlay-body-wrap'>" +
 						       "<div class='full-screen-overlay-body'>" +
 							   "</div>" +
 						   "</div>";
 				},
 
-				getBodyContent: function() {
-					// If no HTML has been given for the body content then default to the
-					// HTML of the element that the fullScreenOverlay function was activated on.
-					if(this.settings.bodyContent === null) {
-						return $(this.element).show().wrap('<div></div>').parent().html();
-					}
-					else {
-						// User has provided either a jQuery selector or an HTML string.
-						return $(this.settings.bodyContent).show().html();
-					}					
-				},
-				
-				openOverlay: function() {
+				_addHeadContent: function() {
 					// Create the header content.
 					if(this.settings.fixedHeader) {
 						$(this.settings.headerContent).show();
@@ -148,7 +138,9 @@
 						// on the HTML body to avoid duplicate scrollbars.
 						$('body').addClass('full-screen-overlay-no-scroll');
 					}
+				},
 
+				_addBodyContent: function() {
 					// Grab the body content and append to the overlay body. Appending moves
 					// the content into the overlay (as oppose to cloning it).
 					if(this.settings.bodyContent === null) {
@@ -161,6 +153,12 @@
 						$(this.settings.bodyContent).show();
 						$('.full-screen-overlay-body', '#' + this.id).append($(this.settings.bodyContent));
 					}
+				},
+
+				open: function() {
+					this._addHeadContent();
+
+					this._addBodyContent();
 
 					// If other overlays ar displayed, close them.
 					$('.full-screen-overlay-wrap').hide();
@@ -168,7 +166,7 @@
 					// Finally, show the overlay.
 					$('#' + this.id).show();
 				},
-				closeOverlay: function() {
+				close: function() {
 					// Hide the overlay.
 					$('#' + this.id).fadeOut();
 				},
@@ -177,16 +175,62 @@
 		// A really lightweight plugin wrapper around the constructor,
 		// allowing multiple instantiations.
 		$.fn.fullScreenOverlay = function ( options ) {
-				return this.each(function() {
-					// Track which index of the instances array this occupies.
-					var index = instances.length;
+			var args = arguments;
 
-					// Store the instance number inside the element.
-					$.data(this, "plugin_" + pluginName + "_instance_num", index);
+	        // Is the first parameter an object (options), or was omitted,
+	        // instantiate a new instance of the plugin.
+	        if (options === undefined || typeof options === 'object') {
+	            return this.each(function () {
 
-					// Instanciate plugin.
-					instances.push(new Plugin( this, options ));
-				});
+	                // Only allow the plugin to be instantiated once,
+	                // so we check that the element has no plugin instantiation yet
+	                if (!$.data(this, 'plugin_' + pluginName)) {
+
+	                    // Set the instance Id.
+	                    $.data(this, 'plugin_' + pluginName + '_instanceId', instanceId);
+	                    instanceId++;
+
+	                    // if it has no instance, create a new one,
+	                    // pass options to our plugin constructor,
+	                    // and store the plugin instance
+	                    // in the elements jQuery data object.
+	                    $.data(this, 'plugin_' + pluginName, new Plugin( this, options ));
+	                }
+	            });
+
+	        // If the first parameter is a string and it doesn't start
+	        // with an underscore or "contains" the `init`-function,
+	        // treat this as a call to a public method.
+	        } else if (typeof options === 'string' && options[0] !== '_' && options !== 'init') {
+
+	            // Cache the method call
+	            // to make it possible
+	            // to return a value
+	            var returns;
+
+	            this.each(function () {
+	                var instance = $.data(this, 'plugin_' + pluginName);
+
+	                // Tests that there's already a plugin-instance
+	                // and checks that the requested public method exists
+	                if (instance instanceof Plugin && typeof instance[options] === 'function') {
+
+	                    // Call the method of our plugin instance,
+	                    // and pass it the supplied arguments.
+	                    returns = instance[options].apply( instance, Array.prototype.slice.call( args, 1 ) );
+	                }
+
+	                // Allow instances to be destroyed via the 'destroy' method
+	                if (options === 'destroy') {
+	                  $.data(this, 'plugin_' + pluginName, null);
+	                }
+	            });
+
+	            // If the earlier cached method
+	            // gives a value back return the value,
+	            // otherwise return this to preserve chainability.
+	            return returns !== undefined ? returns : this;
+	        }
 		};
 
 })( jQuery, window, document );
