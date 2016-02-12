@@ -55,6 +55,7 @@
 		// Avoid Plugin.prototype conflicts
 		$.extend(Plugin.prototype, {
 				id: '',
+				selector: '',
 				bodyContent: '',
 				headerContent: '',
 				init: function () {
@@ -65,7 +66,8 @@
 						// you can add more functions like the one below and
 						// call them like the example below
 						var _this = this;
-						this.id = 'full-screen-overlay-' + $(this.element).data("plugin_fullScreenOverlay_instance_num");
+						this.instanceNum = $(this.element).data("plugin_fullScreenOverlay_instance_num");
+						this.id = 'full-screen-overlay-' + this.instanceNum;
 
 						// We should hide the header and body content initially. We will only show it
 						// once the overlay is triggered.
@@ -141,25 +143,33 @@
 					if(this.settings.fixedHeader) {
 						$(this.settings.headerContent).show();
 						$('.full-screen-overlay-header', '#' + this.id).append($(this.settings.headerContent));
+
+						// If we have a fixed header then we remove the scrolling ability
+						// on the HTML body to avoid duplicate scrollbars.
+						$('body').addClass('full-screen-overlay-no-scroll');
 					}
 
 					// Grab the body content and append to the overlay body. Appending moves
 					// the content into the overlay (as oppose to cloning it).
-					if(this.settings.bodyContent !== null) {
-						// No body content provided so use the jQuery element that fullScreenOverlay
-						// was fired on.
-						$(this.settings.bodyContent).show();
-						$('.full-screen-overlay-body', '#' + this.id).append($(this.settings.bodyContent));
-					}
-					else {
+					if(this.settings.bodyContent === null) {
+						// No body content provided so use the jQuery element that fullScreenOverlay()
+						// was activated on.
 						$(this.element).show();
 						$('.full-screen-overlay-body', '#' + this.id).append($(this.element));
 					}
+					else {
+						$(this.settings.bodyContent).show();
+						$('.full-screen-overlay-body', '#' + this.id).append($(this.settings.bodyContent));
+					}
+
+					// If other overlays ar displayed, close them.
+					$('.full-screen-overlay-wrap').hide();
 
 					// Finally, show the overlay.
 					$('#' + this.id).show();
 				},
 				closeOverlay: function() {
+					// Hide the overlay.
 					$('#' + this.id).fadeOut();
 				},
 		});
