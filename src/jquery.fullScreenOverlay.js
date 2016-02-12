@@ -81,11 +81,12 @@
 				},
 				_events: function(_this) {
 						// Open the overlay handler.
-						$(_this.settings.openTrigger).on('click keypress', function(e) {
-							_this.open(e);
+						$(_this.settings.openTrigger).on('click.fullScreenOverlay keypress.fullScreenOverlay', function(e) {
+							_this.open(e, _this);
 						});
 						// Close overlay handler.
-						$(_this.settings.closeTrigger).on('click keypress', function(e) {
+						$(_this.settings.closeTrigger).off('click.fullScreenOverlay keypress.fullScreenOverlay');
+						$(_this.settings.closeTrigger).on('click.fullScreenOverlay keypress.fullScreenOverlay', function(e) {
 							_this.close(e);
 						});
 				},
@@ -176,14 +177,20 @@
 					}
 				},
 
-				open: function(e) {
+				open: function(e, _this) {
 
 					if(typeof this.settings.onBeforeOpen !== 'undefined') {
-						this.settings.onBeforeOpen(e);
+						this.settings.onBeforeOpen(e, _this);
 					}
 
 					this._addHeadContent();
 					this._addBodyContent();
+
+					// Add the submit handler for the close button.  Avoid duplicates by turning off first.
+					$(this.settings.closeTrigger).off('click.fullScreenOverlay keypress.fullScreenOverlay');
+					$(this.settings.closeTrigger).on('click.fullScreenOverlay keypress.fullScreenOverlay', function(e) {
+						_this.close(e);
+					});
 
 					// Rmove the scrolling ability on the HTML body to avoid duplicate scrollbars
 					// and to prevent the content underneath from scrolling.
@@ -196,19 +203,19 @@
 					$('#' + this.id).show();
 
 					if(typeof this.settings.onAfterOpen !== 'undefined') {
-						this.settings.onAfterOpen(e);
+						this.settings.onAfterOpen(e, _this);
 					}
 				},
 				close: function() {
 					if(typeof this.settings.onBeforeClose !== 'undefined') {
-						this.settings.onBeforeClose(e);
+						this.settings.onBeforeClose(e, _this);
 					}
 
 					// Hide the overlay.
 					$('#' + this.id).fadeOut();
 
 					if(typeof this.settings.onAfterClose !== 'undefined') {
-						this.settings.onAfterClose(e);
+						this.settings.onAfterClose(e, _this);
 					}
 				},
 		});
