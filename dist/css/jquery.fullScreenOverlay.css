@@ -6,17 +6,20 @@
  *  Made by Zeno Rocha
  *  Under MIT License
  */
-body {
-
-}
 .full-screen-overlay-wrap {
 	width: 100%;
     top: 0;
     z-index: 1001;
     position: absolute;
+    box-sizing: border-box;
 }
-.full-screen-overlay-fixed-header {
-	
+.full-screen-overlay-no-fixed-header {
+	position: fixed;
+	bottom: 0;
+	overflow-y: auto;
+}
+.full-screen-overlay-wrap div {
+	box-sizing: border-box;
 }
 .full-screen-overlay-header-wrap {
     height: 130px;
@@ -32,14 +35,22 @@ body {
 }
 .full-screen-overlay-body-wrap {
 	width: 100%;
-	top: 130px;
-    position: fixed;
+    position: absolute;
     overflow-y: scroll !important;
     bottom: 0;
     background-color: #fff;
-    padding-top: 63px;
+    padding-top: 25px;
     color: #000;	
     background: #fff;
+    margin: 0 auto;
+}
+.full-screen-overlay-no-fixed-header .full-screen-overlay-body-wrap {
+	position: static;
+	bottom: initial;
+}
+.full-screen-overlay-fixed-header .full-screen-overlay-body-wrap {
+	top: 130px;
+	position: fixed;
 }
 .full-screen-overlay-body {
 	max-width: 1200px;
