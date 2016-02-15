@@ -231,11 +231,15 @@
 					}
 
 					// Hide the overlay.
-					$('#' + this.id).fadeOut();
+					$('#' + this.id).fadeOut({
+						complete: function() {
+							// Active the scrolling ability on the HTML body.
+							$('.full-screen-overlay', '#' + this.id).addClass('full-screen-overlay-no-scroll');
+							$('body').removeClass('full-screen-overlay-no-scroll');
+						}
+					});
 
-					// Active the scrolling ability on the HTML body.
-					$('.full-screen-overlay', '#' + this.id).addClass('full-screen-overlay-no-scroll');
-					$('body').removeClass('full-screen-overlay-no-scroll');
+					
 
 					// Denote that the overlay is open.
 					this.overlayOpen = false;
