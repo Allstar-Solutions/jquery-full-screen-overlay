@@ -91,7 +91,7 @@
 						// Close overlay handler.
 						$(_this.settings.closeTrigger).off('click.fullScreenOverlay keypress.fullScreenOverlay');
 						$(_this.settings.closeTrigger).on('click.fullScreenOverlay keypress.fullScreenOverlay', function(e) {
-							_this.close(e);
+							_this.close(e, _this);
 						});
 				},
 
@@ -200,7 +200,7 @@
 					// Add the submit handler for the close button.  Avoid duplicates by turning off first.
 					$(this.settings.closeTrigger).off('click.fullScreenOverlay keypress.fullScreenOverlay');
 					$(this.settings.closeTrigger).on('click.fullScreenOverlay keypress.fullScreenOverlay', function(e) {
-						_this.close(e);
+						_this.close(e, _this);
 					});
 
 					// Rmove the scrolling ability on the HTML body to avoid duplicate scrollbars
@@ -221,7 +221,7 @@
 						this.settings.onAfterOpen(e, _this);
 					}
 				},
-				close: function(e) {
+				close: function(e, _this) {
 					if(typeof e !== 'undefined') {
 						e.preventDefault();
 					}
