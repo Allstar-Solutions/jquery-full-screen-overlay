@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Jquery-full-screen-overlay by Allstar-Solutions</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Jquery-full-screen-overlay</h1>
+        <h2>Places content in an overlay that covers the entire screen.  Optionally add a fixed position header.</h2>
+        <a href="https://github.com/Allstar-Solutions/jquery-full-screen-overlay" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <p>Docs are a work in progress...</p>
+
+<h2>
+<a id="options" class="anchor" href="#options" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Options</h2>
+
+<p><code>openTrigger: ".full-screen-overlay-open"</code><br>
+<strong>openTrigger</strong> <em>(jQuery selector)</em>: This should be overriden with a unique selector when you have more than one full screen overlay on the 
+page.  Otherwise clicking the element with class <code>.full-screen-overlay-open</code> will open ALL overlays.</p>
+
+<p><code>closeTrigger: ".full-screen-overlay-close",</code> <br>
+<strong>closeTrigger</strong> <em>(jQuery selector)</em>: This should be overriden with a unique selector when you have more than one full screen overlay on the 
+page.  Otherwise clicking the element with class .full-screen-overlay-close will close ALL overlays.  If a custom value is entered here then <code>closeButtonOmit</code> should also be set to true.</p>
+
+<p><code>fixedHeader: false</code><br>
+<strong>fixedHeader</strong> <em>(boolean)</em>:  When set to <code>true</code> a sticky section will be attached to the top of the overlay using postion fixed. This will mean that only the overlay body will scroll.</p>
+
+<p><code>headerContent: ''</code><br>
+<strong>headerContent</strong> <em>(string)</em>: Enter a jQuery selector or HTML markup.  Only applicable if fixedHeader is true.</p>
+
+<p><code>bodyContent: ''</code><br>
+<strong>bodyContent</strong> <em>(string)</em>: If left as an empty string then the innerHtml of the element that called .fullScreenOverlay() will be used. Enter a jQuery selector or HTML markup to use HTML markup from elsewhere on the page.</p>
+
+<p><code>closeButtonMarkup: ''</code><br>
+<strong>closeButtonMarkup</strong> <em>(string)</em>: By default this plugin will add a close button using the FontAwesome cross icon.  If you wish to override the markup for the button to add a custom image, for example, then add the markup here.  Alternatively, set closeButtonOmit to true and include your close button in the <code>headerContent</code>, <code>bodyContent</code> or inside the element which <code>fullScreenOverlay()</code> is called on. </p>
+
+<p><code>closeButtonLocation: '.full-screen-overlay-body'</code><br>
+<strong>closeButtonLocation</strong> <em>(string)</em>: Not applicable if closeTrigger is set.  This determines where the plugin will add it's default close button.  Use <code>.full-screen-overlay-header</code> to place in the header if using <code>fixedHeader: true</code>.  Otherwise leave as `.full-screen-overlay-body' to place in body.</p>
+
+<p><code>closeButtonOmit: 'false'</code><br>
+<strong>closeButtonOmit</strong> <em>(boolean)</em>: When set to <code>true</code> the default close button provided by the plugin will be omitted.  Use in conjunction with <code>closeTrigger</code> to tell the plugin which element should be used as the close trigger.</p>
+
+<p><code>cssClasses: ''</code><br>
+<strong>cssClasses</strong> <em>(string)</em>: A space separated list of css classes to add to the overlay wrap.</p>
+
+<h3>
+<a id="events" class="anchor" href="#events" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Events</h3>
+
+<p>The following events can be used by setting the relevant option:</p>
+
+<p><code>onBeforeOpen(e, fullScreenOverlayObject)</code><br>
+<code>onAfterOpen(e, fullScreenOverlayObject)</code><br>
+<code>onBeforeClose(e, fullScreenOverlayObject)</code><br>
+<code>onAfterClose(e, fullScreenOverlayObject)</code></p>
+
+<p><strong>Example:</strong></p>
+
+<pre><code>$('.my-element').fullScreenOverlay({
+    onAfterOpen: function(e, fullScreenOverlayObject) {
+        // Move focus into the dialog for accessibility.
+        $('.my-focus-element-inside-the-overlay').focus();
+    },
+    onAfterClose: function(e, fullScreenOverlayObject) {
+        // Move focus back to the main page for accessibility.
+        $('.my-focus-element-on-the-main-page').focus();
+    },
+});
+</code></pre>
+
+<h2>
+<a id="functions" class="anchor" href="#functions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Functions</h2>
+
+<p><code>$('.my-element').fullScreenOverlay('open');</code>
+Open the overlay.  Useful for responsive where you may want to show/hide a mobile nav overlay depending on the browser width.</p>
+
+<p><code>$('.my-element').fullScreenOverlay('close');</code>
+Close the overlay.  Useful for responsive where you may want to show/hide a mobile nav overlay depending on the browser width.</p>
+
+<p><code>$('.my-element').fullScreenOverlay('isOpen');</code>
+Returns true or false depending on whether the overlay is currently open.</p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/Allstar-Solutions/jquery-full-screen-overlay/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/Allstar-Solutions/jquery-full-screen-overlay/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/Allstar-Solutions/jquery-full-screen-overlay"></a> is maintained by <a href="https://github.com/Allstar-Solutions">Allstar-Solutions</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
