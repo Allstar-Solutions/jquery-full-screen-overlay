@@ -21,6 +21,14 @@
 .full-screen-overlay-wrap div {
 	box-sizing: border-box;
 }
+.full-screen-overlay-no-fixed-header .full-screen-overlay {
+	height: 100%;
+	overflow-y: scroll;
+	-webkit-overflow-scrolling: touch;
+}
+.full-screen-overlay-wrap .full-screen-overlay.no-scroll {
+	overflow-y: hidden;
+}
 .full-screen-overlay-header-wrap {
     height: 130px;
     overflow: hidden;
@@ -35,8 +43,10 @@
 }
 .full-screen-overlay-body-wrap {
 	width: 100%;
+	height: auto;
     position: absolute;
-    overflow-y: scroll !important;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
     bottom: 0;
     background-color: #fff;
     padding-top: 25px;
@@ -45,8 +55,11 @@
     margin: 0 auto;
 }
 .full-screen-overlay-no-fixed-header .full-screen-overlay-body-wrap {
-	position: static;
+	position: relative;
 	bottom: initial;
+	overflow-y: hidden;
+	height: auto;
+	min-height: 100%;
 }
 .full-screen-overlay-fixed-header .full-screen-overlay-body-wrap {
 	top: 130px;
@@ -59,7 +72,16 @@
     overflow-y: hidden;
 }
 
+.full-screen-overlay-close {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	cursor: pointer;
+}
+
 .full-screen-overlay-no-scroll {
 	overflow-y: hidden;
+}
+body.full-screen-overlay-no-scroll {
 	position: fixed;
 }

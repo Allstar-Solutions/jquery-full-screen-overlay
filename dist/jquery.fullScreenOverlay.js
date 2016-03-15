@@ -39,13 +39,17 @@
 				// This will mean that only the overlay body will scroll.
 				fixedHeader: false,
 				// Enter a jQuery selector or HTML markup.  Only applicable if fixedHeader is true.  
-				headerContent: null,
+				headerContent: '',
 				// Enter a jQuery selector or HTML markup.
-				bodyContent: null,
+				bodyContent: '',
 				// A string containing HTML markup for the close button.
-				closeButtonMarkup: null,
-				// 'header' or 'body'.
-				closeButtonLocation: 'header'
+				closeButtonMarkup: '',
+				// Enter a jQuery selector string.  To place in fixed header use .full-screen-overlay-header.
+				closeButtonLocation: '.full-screen-overlay-body',
+				// Set to true if you intend to add your own close button markup inside the headerContent or bodyContent.
+				closeButtonOmit: false,
+				// A string containing multiple space separated css class to add to the overlay wrapper.
+				cssClasses: ''
 		};
 
 		// The actual plugin constructor
@@ -67,6 +71,8 @@
 				instanceId: '',
 				bodyContent: '',
 				headerContent: '',
+				overlayOpen: false,
+
 				init: function () {
 						// Place initialization logic here
 						// You already have access to the DOM element and
@@ -87,24 +93,25 @@
 				},
 				_events: function(_this) {
 						// Open the overlay handler.
-						$(_this.settings.openTrigger).on('click keypress', function() {
-							_this.open();
+						$(_this.settings.openTrigger).on('click.fullScreenOverlay keypress.fullScreenOverlay', function(e) {
+							_this.open(e, _this);
 						});
 						// Close overlay handler.
-						$(_this.settings.closeTrigger).on('click keypress', function() {
-							_this.close();
+						$(_this.settings.closeTrigger).off('click.fullScreenOverlay keypress.fullScreenOverlay');
+						$(_this.settings.closeTrigger).on('click.fullScreenOverlay keypress.fullScreenOverlay', function(e) {
+							_this.close(e, _this);
 						});
 				},
 
 				_hideContent: function() {
-					if(this.settings.bodyContent !== null) {
+					if(this.settings.bodyContent !== '') {
 						$(this.settings.bodyContent).hide();
 					}
 					else {
 						$(this.element).hide();
 					}
 
-					if(this.settings.fixedHeader && this.settings.headerContent !== null) {
+					if(this.settings.fixedHeader && this.settings.headerContent !== '') {
 						$(this.settings.headerContent).hide();
 					}
 				},
@@ -113,12 +120,16 @@
 					var classes = "full-screen-overlay-wrap full-screen-overlay-no-fixed-header";
 					var headerMarkup = '';
 
+					// Denote fixed header on the main wrapper, so that the body can adjust it's
+					// styles accordingly in the CSS file.
 					if(this.settings.fixedHeader) {
 						classes = "full-screen-overlay-wrap full-screen-overlay-fixed-header";
 						headerMarkup = this._headerBoilerplate();
 					}
 
-					var markup = '<div style="display:none;" class="' + classes + '" id="' + this.id + '">' +
+					classes = classes + ' ' + this.settings.cssClasses;
+
+					var markup = '<div style="display:none;" class="' + classes + ' ' + this.id + '" id="' + this.id + '">' +
 							         '<div class="full-screen-overlay">' +
 								         headerMarkup +
 									     this._bodyBoilerplate() +
@@ -126,14 +137,13 @@
 						          '</div>';
 
 					$('body').append(markup);
+
+					// Add the close button.
+					$('#' + this.id + ' ' + this.settings.closeButtonLocation).append(this._closeButtonMarkup());
 				},
 				_headerBoilerplate: function() {
 					var markup =  "<div class='full-screen-overlay-header-wrap'>" +
 						       		 "<div class='full-screen-overlay-header'>";
-
-					if(this.settings.closeButtonLocation == 'header' && this.settings.fixedHeader == true) {
-						markup = markup + this._closeButtonMarkup(); ;
-					}
 
 					return markup + "</div>" +
 						   		 "</div>";
@@ -142,17 +152,17 @@
 					var markup = "<div class='full-screen-overlay-body-wrap'>" +
 						             "<div class='full-screen-overlay-body'>";
 
-					if(this.settings.closeButtonLocation == 'body') {
-						markup = markup + this._closeButtonMarkup();
-					}
-
 					return markup + "</div>" +
 						        "</div>";
 				},
 				_closeButtonMarkup: function() {
+					if(this.settings.closeButtonOmit) {
+						return '';
+					}
+
 					var markup = "<div class='full-screen-overlay-close' title='Click to close overlay.' role='button'>";
 
-					if(this.settings.closeButtonMarkup !== null) {
+					if(this.settings.closeButtonMarkup !== '') {
 						markup = markup + this.settings.closeButtonMarkup;
 					}
 					else {
@@ -165,17 +175,13 @@
 					if(this.settings.fixedHeader) {
 						$(this.settings.headerContent).show();
 						$('.full-screen-overlay-header', '#' + this.id).append($(this.settings.headerContent));
-
-						// If we have a fixed header then we remove the scrolling ability
-						// on the HTML body to avoid duplicate scrollbars.
-						$('body').addClass('full-screen-overlay-no-scroll');
 					}
 				},
 
 				_addBodyContent: function() {
 					// Grab the body content and append to the overlay body. Appending moves
 					// the content into the overlay (as oppose to cloning it).
-					if(this.settings.bodyContent === null) {
+					if(this.settings.bodyContent === '') {
 						// No body content provided so use the jQuery element that fullScreenOverlay()
 						// was activated on.
 						$(this.element).show();
@@ -187,21 +193,72 @@
 					}
 				},
 
-				open: function() {
-					this._addHeadContent();
+				open: function(e, _this) {
+					if(typeof e !== 'undefined') {
+						e.preventDefault();
+					}
 
+					if(typeof this.settings.onBeforeOpen !== 'undefined') {
+						this.settings.onBeforeOpen(e, _this);
+					}
+
+					this._addHeadContent();
 					this._addBodyContent();
+
+					// Add the submit handler for the close button.  Avoid duplicates by turning off first.
+					$(this.settings.closeTrigger).off('click.fullScreenOverlay keypress.fullScreenOverlay');
+					$(this.settings.closeTrigger).on('click.fullScreenOverlay keypress.fullScreenOverlay', function(e) {
+						_this.close(e, _this);
+					});
+
+					// Rmove the scrolling ability on the HTML body to avoid duplicate scrollbars
+					// and to prevent the content underneath from scrolling.
+					$('body').addClass('full-screen-overlay-no-scroll');
+					$('.full-screen-overlay', '#' + this.id).removeClass('full-screen-overlay-no-scroll');
 
 					// If other overlays are displayed, close them.
 					$('.full-screen-overlay-wrap').hide();
 
+					// Denote that the overlay is open.
+					this.overlayOpen = true;
+
 					// Finally, show the overlay.
 					$('#' + this.id).show();
+
+					if(typeof this.settings.onAfterOpen !== 'undefined') {
+						this.settings.onAfterOpen(e, _this);
+					}
 				},
-				close: function() {
+				close: function(e, _this) {
+					if(typeof e !== 'undefined') {
+						e.preventDefault();
+					}
+
+					if(typeof this.settings.onBeforeClose !== 'undefined') {
+						this.settings.onBeforeClose(e, _this);
+					}
+
 					// Hide the overlay.
-					$('#' + this.id).fadeOut();
+					$('#' + this.id).fadeOut({
+						complete: function() {
+							// Active the scrolling ability on the HTML body.
+							$('.full-screen-overlay', '#' + this.id).addClass('full-screen-overlay-no-scroll');
+							$('body').removeClass('full-screen-overlay-no-scroll');
+						}
+					});
+
+					
+
+					// Denote that the overlay is open.
+					this.overlayOpen = false;
+
+					if(typeof this.settings.onAfterClose !== 'undefined') {
+						this.settings.onAfterClose(e, _this);
+					}
 				},
+				isOpen: function() {
+					return this.overlayOpen;
+				}
 		});
 
 		// A really lightweight plugin wrapper around the constructor,
