@@ -41,7 +41,9 @@
 				// Set to true if you intend to add your own close button markup inside the headerContent or bodyContent.
 				closeButtonOmit: false,
 				// A string containing multiple space separated css class to add to the overlay wrapper.
-				cssClasses: ''
+				cssClasses: '',
+				// Choose whether to hide the body and header content initially.
+				hideContent: true
 		};
 
 		// The actual plugin constructor
@@ -78,7 +80,9 @@
 
 						// We should hide the header and body content initially. We will only show it
 						// once the overlay is triggered.
-						this._hideContent();
+						if(this.hideContent) {
+							this._hideContent();
+						}
 
 						this._createOverlayBoilerplate();
 						this._events(_this);

@@ -31,6 +31,13 @@ page.  Otherwise clicking the element with class .full-screen-overlay-close will
 `cssClasses: ''`<br />
 **cssClasses** *(string)*: A space separated list of css classes to add to the overlay wrap.
 
+`hideContent: true`<br />
+**hideContent** *(boolean)*: Choose whether to hide the body and header content initially.
+
+### Usage
+
+Immport the Full Screen Overlay CSS and JS file to your project.  See demo folder for usage example.
+
 ### Events
 
 The following events can be used by setting the relevant option:
